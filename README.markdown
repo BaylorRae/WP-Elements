@@ -3,7 +3,7 @@ This class makes it super easy to add meta boxes to WordPress pages.
 `demo_page.php` implements all the methods in the class, and comments out the optional parameters. The optional parameters have their default value as well.
 
 ### The Basics
-The WPElements class takes to parameters. The first is the page ('post', 'page', 'link', 'custom\_post\_type'). The second is for the box type.
+The WPElements class takes two parameters. The first is the page ('post', 'page', 'link', 'custom\_post\_type'). The second is for the box type.
 
 When setting the box type, `true` will add html for a form. `false` will not. This way you can add boxes with a paragraph or html. Similar to the "Post Thumbnail" box.
 
