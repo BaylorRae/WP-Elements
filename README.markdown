@@ -1,7 +1,7 @@
 ### About WP Elements
 WP Elements is a series of classes to make building WordPress plugins easy. Whether your creating a meta box or adding navigation menus, it's a breeze.
 
-The demo pages use will show you the structure WP Elements use and all of the methods inside each class. The commented lines are the optional parameters with their default value.
+The demo pages will show you the structure WP Elements classes use and all of the methods inside each class. The commented lines are the optional parameters with their default value.
 
 ### Making a form
 
@@ -32,7 +32,7 @@ The demo pages use will show you the structure WP Elements use and all of the me
 	    // 'width' => 500
 	  ));
 	
-	// TinyMCE form
+	// TinyMCE form (still very buggy)
 	$form->addEditor(array(
 	    'id' => 'evenmore',
 	    'label' => "Don't Hold Back On Me",
@@ -54,6 +54,7 @@ The demo pages use will show you the structure WP Elements use and all of the me
 	$box->paragraph('Please use it, and click my <a href="#">link</a>');
 	
 ### Making a top level navigation menu
+Helps to read the WordPress Codex on [Adding Administration Menus](http://codex.wordpress.org/Adding_Administration_Menus)
 
 	$topPage = new topMenuLink(array(
 	    'page_title' => 'What Up',
@@ -84,7 +85,7 @@ The demo pages use will show you the structure WP Elements use and all of the me
 	
 ### Adding sub level navigation items
 	
-	// This will go under the Dashboard Tab
+	// This will go under the Dashboard tab
 	$subPage = new subMenuLink(array(
 	    'parent_slug' => 'index.php', // slug of dashboard tab
 	    'page_title' => 'Analytics',

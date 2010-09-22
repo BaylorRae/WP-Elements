@@ -16,7 +16,9 @@ include 'WP-Elements.class.php';
 $poem = new metaBox(array(
     'isFormBox' => true,
     'id' => 'whatDoYaThink',
-    'title' => 'What Do Ya Think'
+    'title' => 'What Do Ya Think',
+    // 'context' => 'advanced', (normal, advanced, side)
+    // 'priority' => 'default' (high, low)
   ));
 
 $poem->addInput(array(
@@ -103,9 +105,11 @@ $poem->addDropdown(array(
 // ===============
 // = Regular Box =
 // ===============
-$box2 = new WPElement('post', $isForm = false);
-
-$box2->createMetaBox('box2', 'This is my second box', 'side');
+$box2 = new metaBox(array(
+    'id' => 'box2',
+    'title' => 'This is my second box',
+    'context' => 'side'
+  ));
 
 $box2->html('<p>Please click on my <a href="#">link</a></p>');
 
