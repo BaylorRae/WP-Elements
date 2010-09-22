@@ -1,31 +1,39 @@
 <?php
 
-if( !class_exists('WPElement') ) {
+// Used for creating meta boxes
+if( !class_exists('metaBox') ) {
 
-  class WPElement {
+  class metaBox {
 
     private $type = null;
-    private $useFormStructure = true;
+    private $useFormStructure = false;
     private $elements = array();
     private $boxProperties = array();
     private $fileName = null;
-
-    function __construct($type, $useFormStructure = true) {
-      $this->type = $type;
-      $this->useFormStructure = $useFormStructure;
-
+    
+    function __construct($args) {
+      
+      // Check for required fields
+      if( !isset($args['type'], $args['id'], $args['title']) )
+        return false;
+      
+      $this->type = $args['type'];
+      // $this->useFormStructure = $args['useFormStructure'];
+      
+      if( isset($args['isFormBox']) )
+        $this->useFormStructure = true;
+              
       $debug = debug_backtrace();
       $this->fileName = $debug[0]['file'];
+      
+      $this->boxProperties['id'] = $args['id'];
+      $this->boxProperties['title'] = $args['title'];
+      $this->boxProperties['context'] = (empty($args['context'])) ? 'advanced' : $args['context'];
+      $this->boxProperties['priority'] = (empty($args['priority'])) ? 'default' : $args['priority'];
+            
+      add_action('admin_menu', array($this, 'addMetaBox'));
+      
     }
-
-    public function createMetaBox($id, $title, $context = null, $priority = null) {
-      $this->boxProperties['id'] = $id;
-      $this->boxProperties['title'] = $title;
-      $this->boxProperties['context'] = (empty($context)) ? 'advanced' : $context;
-      $this->boxProperties['priority'] = (empty($priority)) ? 'default' : $priority;
-
-      add_action('admin_menu', array($this, 'addmetaBox'));
-    }  
 
     public function addMetaBox() {
       $id = $this->boxProperties['id'];
@@ -38,7 +46,7 @@ if( !class_exists('WPElement') ) {
     public function doMetaBox() {
 
       $elements = $this->elements;
-
+      
       if( $this->useFormStructure )
         echo '<table class="form-table">';
 
@@ -47,7 +55,7 @@ if( !class_exists('WPElement') ) {
       foreach( $elements as $elem ) {
         $elem = (object) $elem;
 
-        if( empty($elem->id) )
+        if( !in_array($elem->type, array('paragraph', 'html')) && empty($elem->id) )
           continue;
 
         $elem->id = $this->boxProperties['id'] . '_' .  $elem->id;
@@ -202,7 +210,7 @@ if( !class_exists('WPElement') ) {
           echo '</td>';
           echo '</tr>';
         }
-
+        
       } // end foreach
 
       if( $this->useFormStructure )
@@ -247,6 +255,86 @@ if( !class_exists('WPElement') ) {
     }
 
   }  
+  
+}
+
+// Used for creating navigation
+if( !class_exists('topMenuLink') && !class_exists('subMenuLink') ) {
+  
+  class topMenuLink {
+    
+    private $args = array();
+    
+    function __construct($args) {
+      
+      // Check for required args
+      if( !isset($args['page_title'], $args['menu_title'], $args['capability'], $args['menu_slug']) )
+        return false;
+        
+      $args['function'] = (isset($args['function'])) ? $args['function'] : null;
+      $args['icon_url'] = (isset($args['icon_url'])) ? $args['icon_url'] : null;
+      $args['position'] = (isset($args['position'])) ? $args['position'] : null;
+        
+      $this->args = $args;
+      
+      add_action('admin_menu', array($this, 'addTopMenu'));
+    }
+    
+    public function addTopMenu() {
+      global $menu;
+      
+      $hookname = add_menu_page($this->args['page_title'], $this->args['menu_title'], $this->args['capability'], $this->args['menu_slug'], $this->args['function'], $this->args['icon_url'], $this->args['position']);  
+      if( isset($this->args['has_separator']) ) {
+        $where = $this->args['has_separator'];
+        $key = key($menu);
+        switch ($where) {
+          
+          case 'after' :
+            $menu[$key + 1] = array( '', 'read', 'separator1', '', 'wp-menu-separator' );
+          break;
+          
+          case 'before' :
+            $menu[$key - 1] = array( '', 'read', 'separator1', '', 'wp-menu-separator' );
+          break;
+          
+          case 'both' :
+            $menu[$key + 1] = array( '', 'read', 'separator1', '', 'wp-menu-separator' );
+            $menu[$key - 1] = array( '', 'read', 'separator1', '', 'wp-menu-separator' );
+          break;
+          
+        }
+        
+      }
+    }
+    
+    public function addSubLink($args) {
+      $link = new subMenuLink($args);
+    }
+    
+  }
+  
+  class subMenuLink {
+    
+    private $args;
+    
+    function __construct($args) {
+      
+      // Check for required args
+      if( !isset($args['parent_slug'], $args['page_title'], $args['menu_title'], $args['capability'], $args['menu_slug']) )
+        return false;
+        
+      $args['function'] = (isset($args['function'])) ? $args['function'] : null;
+      
+      $this->args = $args;
+      
+      add_action('admin_menu', array($this, 'addSubMenu'));
+    }
+    
+    public function addSubMenu() {
+      add_submenu_page($this->args['parent_slug'], $this->args['page_title'], $this->args['menu_title'], $this->args['capability'], $this->args['menu_slug'], $this->args['function']);
+    }
+    
+  }
   
 }
 

@@ -11,11 +11,15 @@ Author URI: http://baylorrae.com/
 // ===============
 // = Add The Box =
 // ===============
+
 include 'WP-Elements.class.php';
 
-$box = new WPElement('post');
-
-$box->createMetaBox('superHero', 'Add A Super Hero', 'advanced');
+$box = new metaBox(array(
+    'isFormBox' => true,
+    'type' => 'post',
+    'id' => 'superHero',
+    'title' => 'Add a Super Hero'
+  ));
 
 $nickname = null;
 $awesomeness = null;

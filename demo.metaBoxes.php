@@ -1,6 +1,6 @@
 <?php
 /*
-Plugin Name: Fake Plugin
+Plugin Name: Fake Plugin (Meta Boxes)
 Plugin URI: http://baylorrae.com
 Description: What a cool thing
 Author: Baylor Rae'
@@ -10,9 +10,14 @@ Author URI: http://baylorrae.com/
 
 include 'WP-Elements.class.php';
 
-$poem = new WPElement('post');
-
-$poem->createMetaBox('whatDoYaThink', 'What Do Ya Think?');
+// ============
+// = Form Box =
+// ============
+$poem = new metaBox(array(
+    'isFormBox' => true,
+    'id' => 'whatDoYaThink',
+    'title' => 'What Do Ya Think'
+  ));
 
 $poem->addInput(array(
     'id' => 'tellme',
@@ -94,7 +99,10 @@ $poem->addDropdown(array(
     // 'desc' => null
   ));
   
-// Box #2
+
+// ===============
+// = Regular Box =
+// ===============
 $box2 = new WPElement('post', $isForm = false);
 
 $box2->createMetaBox('box2', 'This is my second box', 'side');
