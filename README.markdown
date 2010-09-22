@@ -1,28 +1,17 @@
-This class makes it super easy to add meta boxes to WordPress pages.
+### About WP Elements
+WP Elements is a series of classes to make building WordPress plugins easy. Whether your creating a meta box or adding navigation menus, it's a breeze.
 
-`demo_page.php` implements all the methods in the class, and comments out the optional parameters. The optional parameters have their default value.
-
-### The Basics
-The WPElements class takes two parameters. The first is the page ('post', 'page', 'link', 'custom\_post\_type'). The second is for the box type.
-
-When setting the box type, `true` will add html for a form. `false` will not. This way you can add boxes with a paragraph or html. Similar to the "Post Thumbnail" box.
-
-`WPElements::createMetaBox($id, $title[, $context][, $priority]);`
-
-* `$id (string)(required) HTML 'id' attribute of the box`
-
-* `$title (string)(required) The title of the box`
-
-* `$context (string)(optional) Where to put the box ('normal', 'advanced', 'side') Default: 'advanced'`
-
-* `$priority (string)(optional) The importance of the box. Determines where the box goes. ('high', 'low') Default: 'default'`
+The demo pages use will show you the structure WP Elements use and all of the methods inside each class. The commented lines are the optional parameters with their default value.
 
 ### Making a form
-	
-	// Goes on the post page and will be a form
-	$form = new WPElements('post');
-	
-	$form->createMetaBox('whatDoYaThink', 'What Do Ya Think?');
+
+	// Goes on the post page and will be a form box
+	$form = new metaBox(array(
+		  'isFormBox' => true,
+		  'type' => 'post',
+		  'id' => 'whatDoYaThink',
+		  'title' => 'What Do Ya Think?'
+		));
 	
 	$form->addInput(array(
 	    'id' => 'tellme',
@@ -52,11 +41,59 @@ When setting the box type, `true` will add html for a form. `false` will not. Th
 	  ));
 	
 ### Just a box
-	
-	$box = new WPElements('post', $isForm = false);
-	
-	$box->createMetaBox('aBox', 'A Box', 'side');
+
+	$box = new metaBox(array(
+		  'type' = 'post',
+		  'id' => 'aBox',
+		  'title' => 'A Box',
+		  'context' => 'side'
+		));
 	
 	$box->html('<h3>This is my box</h3>');
 	
 	$box->paragraph('Please use it, and click my <a href="#">link</a>');
+	
+### Making a top level navigation menu
+
+	$topPage = new topMenuLink(array(
+	    'page_title' => 'What Up',
+	    'menu_title' => 'Check me out',
+	    'capability' => 'manage_options',
+	    'menu_slug' => 'what-up',
+	    'function' => 'whatUp',
+	    'has_separator' => null // (before, after, both)
+	  ));
+
+	function whatUp() {
+	  echo 'Hey';
+	}
+	
+	// This will create a subpage under 'What Up'
+	$topPage->addSubLink(array(
+	    'parent_slug' => 'what-up',
+	    'page_title' => 'This is useful',
+	    'menu_title' => 'need to know!',
+	    'capability' => 'manage_options',
+	    'menu_slug' => 'what-up-page2',
+	    'function' => 'whatUp2'
+	  ));
+
+	function whatUp2() {
+	  echo 'Check this out!';
+	}
+	
+### Adding sub level navigation items
+	
+	// This will go under the Dashboard Tab
+	$subPage = new subMenuLink(array(
+	    'parent_slug' => 'index.php', // slug of dashboard tab
+	    'page_title' => 'Analytics',
+	    'menu_title' => 'Analytics',
+	    'capability' => 'manage_options',
+	    'menu_slug' => 'what-up-page2',
+	    'function' => 'analytics'
+	  ));
+
+	function analytics() {
+	  echo '<div class="wrap"><h2>Your Analytics</h2></div>';
+	}
