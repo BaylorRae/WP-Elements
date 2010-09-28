@@ -93,11 +93,10 @@ if( !class_exists('metaBox') ) {
           case 'textarea' :
 
             // Optional values
-            $elem->cols = (empty($elem->cols)) ? 30 : $elem->cols;
             $elem->rows = (empty($elem->rows)) ? 5 : $elem->rows;
             $elem->width = (empty($elem->width)) ? 500 : $elem->width;
 
-            echo '<textarea id="' . $elem->id . '" name="' . $elem->id . '" cols="' . $elem->cols . '" rows="' . $elem->rows . '" style="width: ' . $elem->width . 'px">' . $elem->value . '</textarea>';
+            echo '<textarea id="' . $elem->id . '" name="' . $elem->id . '" rows="' . $elem->rows . '" style="width: ' . $elem->width . 'px">' . $elem->value . '</textarea>';
 
           break;
 
@@ -134,6 +133,8 @@ if( !class_exists('metaBox') ) {
 
                   if( empty($info->id) )
                     continue;
+                    
+                  $info->id = $this->boxProperties['id'] . '_' . $info->id;
 
                   // Optional values
                   $info->checked = (empty($info->checked)) ? false : $info->checked;
@@ -159,11 +160,13 @@ if( !class_exists('metaBox') ) {
               foreach( $elem->options as $label => $id ) {                          
                 if( empty($id) )
                   continue;
-
+                
                 $extra = '';
                 if( $elem->value == $id )
                   $extra .= 'checked="checked"';
-
+                
+                $id = $this->boxProperties['id'] . '_' . $id;
+                
                 echo '<input type="radio" id="' . $id . '" name="' . $elem->id . '" value="' . $id . '" ' . $extra . '/>';
 
                 echo ' <label for="' . $id . '">' . $label . '</label><br />';
@@ -308,6 +311,7 @@ if( !class_exists('topMenuLink') && !class_exists('subMenuLink') ) {
     }
     
     public function addSubLink($args) {
+      $args = array_merge($args, array('parent_slug' => $this->args['menu_slug']));
       $link = new subMenuLink($args);
     }
     
