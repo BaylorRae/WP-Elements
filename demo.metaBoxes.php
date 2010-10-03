@@ -34,7 +34,6 @@ $poem->addTextarea(array(
     'label' => 'Give Me More',
     // 'desc' => null,
     // 'value' => null,
-    // 'cols' => 30,
     // 'rows' => 5,
     // 'width' => 500
   ));
