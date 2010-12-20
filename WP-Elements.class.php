@@ -40,6 +40,7 @@ if( !class_exists('metaBox') ) {
     }
 
     public function doMetaBox() {
+      global $post;
 
       $elements = $this->elements;
       
@@ -50,11 +51,11 @@ if( !class_exists('metaBox') ) {
 
       foreach( $elements as $elem ) {
         $elem = (object) $elem;
+        $id = $elem->id;
 
         if( !in_array($elem->type, array('paragraph', 'html')) && empty($elem->id) )
           continue;
 
-        // $elem->id = $this->boxProperties['id'] . '_' .  $elem->id;
         $elem->id = 'WPElements[' . $this->boxProperties['id'] . '][' . $elem->id . ']';
 
         if( $this->useFormStructure ) {
@@ -73,8 +74,12 @@ if( !class_exists('metaBox') ) {
             echo '<td colspan="2">';
         }
 
-        if( !in_array($elem->type, array('checkbox', 'radiobuttons')) )
-          $elem->value = ( empty($elem->value)) ? '' : $elem->value;
+        if( !in_array($elem->type, array('checkbox', 'radiobuttons')) ) {
+          $elem->value = (empty($elem->value)) ? '' : $elem->value;
+          
+          if( $elem->value == '%AUTO%' )
+            $elem->value = get_post_meta($post->ID, $id, true);
+        }
 
         switch ($elem->type) {
 
