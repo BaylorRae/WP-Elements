@@ -21,29 +21,17 @@ $box = new metaBox(array(
     'title' => 'Add a Super Hero'
   ));
 
-$nickname = null;
-$awesomeness = null;
-if( isset($_GET['post']) ) {
-  $value = get_post_meta($_GET['post'], 'superHeroData', true);
-  
-  if( !empty($value) ) {
-    $value = unserialize($value);
-    
-    $nickname = (empty($value['nickname'])) ? null : $value['nickname'];
-    $awesomeness = (empty($value['awesomeness'])) ? null : $value['awesomeness'];
-  }
-}
-
 $box->addInput(array(
     'id' => 'nickname',
     'label' => 'Nickname',
-    'value' => $nickname
+    'value' => get_post_meta($_GET['post'], 'nickname', true),
+    'size' => 'large'
   ));
   
 $box->addDropdown(array(
     'id' => 'awesomeness',
     'label' => 'Awesomeness',
-    'value' => $awesomeness,
+    'value' => get_post_meta($_GET['post'], 'awesomeness', true),
     'options' => array(
         'Ultra Awesome' => 'ultra',
         'Super Awesome' => 'super',
@@ -52,44 +40,16 @@ $box->addDropdown(array(
         'Super Duper Mega Awesome!' => 'superDuperMega'
       )
   ));
-
-// =======================
-// = Save the Super Hero =
-// =======================
-
-add_action('save_post', 'saveSuperHero');
-
-function saveSuperHero($post_id) {
   
-  // Make sure our form was submitted
-  if( !wp_verify_nonce($_POST['superHero_noncename'], plugin_basename(__FILE__)) )
-    return $post_id;
-    
-  // Make sure this is not an autosave
-  if( defined('DOING_AUTOSAVE') && DOING_AUTOSAVE )
-    return $post_id;
-    
-  // Check permissions
-  $type = $_POST['post_type'];
-  if( !current_user_can('edit_' . $type, $post_id) )
-    return $post_id;
-    
-  $value = array();
-    
-  // Check for nickname
-  $nickname = $_POST['superHero_nickname'];
-  if( !empty($nickname) )
-    $value['nickname'] = $nickname;
-    
-  // Get awesomeness
-  $awesomeness = $_POST['superHero_awesomeness'];
-  if( !empty($awesomeness) )
-    $value['awesomeness'] = $awesomeness;
-  
-  // Save the data as post meta
-  $value = serialize($value);
-  update_post_meta($post_id, 'superHeroData', $value);
-  
-}
+$box->addRadiobuttons(array(
+    'id' => 'gender',
+    'label' => 'Gender',
+    'value' => get_post_meta($_GET['post'], 'gender', true),
+    'options' => array(
+        'Male' => 'male',
+        'Female' => 'female'
+      ),
+    // 'desc' => null
+  ));
 
 ?>

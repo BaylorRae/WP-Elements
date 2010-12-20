@@ -9,7 +9,6 @@ if( !class_exists('metaBox') ) {
     private $useFormStructure = false;
     private $elements = array();
     private $boxProperties = array();
-    private $fileName = null;
     
     function __construct($args) {
       
@@ -18,13 +17,9 @@ if( !class_exists('metaBox') ) {
         return false;
       
       $this->type = $args['type'];
-      // $this->useFormStructure = $args['useFormStructure'];
       
       if( isset($args['isFormBox']) )
         $this->useFormStructure = true;
-              
-      $debug = debug_backtrace();
-      $this->fileName = $debug[0]['file'];
       
       $this->boxProperties['id'] = $args['id'];
       $this->boxProperties['title'] = $args['title'];
@@ -33,6 +28,7 @@ if( !class_exists('metaBox') ) {
             
       add_action('admin_menu', array($this, 'addMetaBox'));
       
+      add_action('save_post', array($this, 'saveBox'));
     }
 
     public function addMetaBox() {
@@ -50,7 +46,7 @@ if( !class_exists('metaBox') ) {
       if( $this->useFormStructure )
         echo '<table class="form-table">';
 
-      echo '<input type="hidden" name="' . $this->boxProperties['id'] . '_noncename" id="' . $this->boxProperties['id'] . '_noncename" value="' . wp_create_nonce( plugin_basename($this->fileName) ) . '" />';
+      echo '<input type="hidden" name="WPElements[' . $this->boxProperties['id'] . '][noncename]" value="' . wp_create_nonce( plugin_basename(__FILE__) ) . '" />';
 
       foreach( $elements as $elem ) {
         $elem = (object) $elem;
@@ -58,7 +54,8 @@ if( !class_exists('metaBox') ) {
         if( !in_array($elem->type, array('paragraph', 'html')) && empty($elem->id) )
           continue;
 
-        $elem->id = $this->boxProperties['id'] . '_' .  $elem->id;
+        // $elem->id = $this->boxProperties['id'] . '_' .  $elem->id;
+        $elem->id = 'WPElements[' . $this->boxProperties['id'] . '][' . $elem->id . ']';
 
         if( $this->useFormStructure ) {
           echo '<tr valign="top">';
@@ -256,8 +253,41 @@ if( !class_exists('metaBox') ) {
     public function html($html) {
       $this->addHTML($html);
     }
+    
+    public static function saveBox($post_id) {
 
-  }  
+      if( empty($_POST['WPElements']) )
+        return $post_id;
+      else {
+        
+        foreach( $_POST['WPElements'] as $boxID => $fields ) {
+          
+          // Make sure our form was submitted
+          if( !wp_verify_nonce($_POST['WPElements'][$boxID]['noncename'], plugin_basename(__FILE__)) )
+            return $post_id;
+
+          // Make sure this is not an autosave
+          if( defined('DOING_AUTOSAVE') && DOING_AUTOSAVE )
+            return $post_id;
+
+          // Check permissions
+          $type = $_POST['post_type'];
+          if( !current_user_can('edit_' . $type, $post_id) )
+            return $post_id;
+            
+          // Save each field
+          foreach( $fields as $field => $value ) {
+            if( $field == 'noncename' )
+              continue;
+            
+            update_post_meta($post_id, $field, str_replace($boxID . '_', '', $value));
+          }
+            
+        }
+        
+      }
+    }
+  }
   
 }
 
